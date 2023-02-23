@@ -1,0 +1,7 @@
+<% if(result._links.prev) { %>
+  <a href="<%= result._links.prev.href %>">Fyrri síða</a>
+<% } %>
+
+<% if(result._links.next) { %>
+  <a href="<%= result._links.next.href %>">Næsta síða</a>
+<% } %>

@@ -57,15 +57,15 @@ export async function dropSchema(dropFile = DROP_SCHEMA_FILE) {
   return query(data.toString('utf-8'));
 }
 
-export async function createEvent({ name, slug, description } = {}) {
+export async function createEvent({ name, slug, description, location, url } = {}) {
   const q = `
     INSERT INTO events
-      (name, slug, description)
+      (name, slug, description, location, url)
     VALUES
-      ($1, $2, $3)
-    RETURNING id, name, slug, description;
+      ($1, $2, $3, $4, $5)
+    RETURNING id, name, slug, description, location, url;
   `;
-  const values = [name, slug, description];
+  const values = [name, slug, description, location, url];
   const result = await query(q, values);
 
   if (result && result.rowCount === 1) {
@@ -138,15 +138,17 @@ export async function register({ name, comment, event } = {}) {
   return null;
 }
 
-export async function listEvents() {
+export async function listEvents(offset = 0, limit = 10) {
   const q = `
     SELECT
       id, name, slug, description, created, updated
     FROM
       events
+    ORDER BY
+      id OFFSET $1 LIMIT $2
   `;
 
-  const result = await query(q);
+  const result = await query(q, [offset, limit]);
 
   if (result) {
     return result.rows;

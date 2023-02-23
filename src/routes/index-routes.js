@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import express from 'express';
 import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
@@ -10,7 +11,32 @@ import {
 export const indexRouter = express.Router();
 
 async function indexRoute(req, res) {
-  const events = await listEvents();
+  let { offset = 0, limit = 10 } = req.query;
+  offset = Number(offset);
+  limit = Number(limit);
+  const events = await listEvents(offset, limit);
+
+  const result = {
+    _links: {
+      self: {
+        href: `/?offset=${offset}&limit=${limit}`
+      }
+    },
+    items: events
+  }
+
+  if (offset > 0) {
+    result._links.prev = {
+      href: `/?offset=${offset - limit}&limit=${limit}`,
+    };
+  }
+
+  if (events.length <= limit && offset < events.length) {
+    result._links.next = {
+      href: `/?offset=${Number(offset) + limit}&limit=${limit}`,
+    };
+  }
+
   const loggedIn = req.isAuthenticated();
   let username;
   let admin;
@@ -26,7 +52,8 @@ async function indexRoute(req, res) {
     admin,
     events,
     loggedIn,
-    username
+    username,
+    result
   });
 }
 
