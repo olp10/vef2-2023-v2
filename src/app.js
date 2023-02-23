@@ -7,6 +7,7 @@ import passport from './lib/login.js';
 import { isInvalid } from './lib/template-helpers.js';
 import { adminRouter } from './routes/admin-routes.js';
 import { indexRouter } from './routes/index-routes.js';
+import { userRouter } from './routes/user-routes.js';
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.locals = {
   isInvalid,
 };
 
+app.use('/', userRouter);
 app.use('/admin', adminRouter);
 app.use('/', indexRouter);
 

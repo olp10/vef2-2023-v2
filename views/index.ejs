@@ -4,8 +4,16 @@
 
 <%- include('events') -%>
 
-<div class="link">
-  <a class="link__link" href="/admin">Innskráning stjórnanda</a>
-</div>
+<% if (!loggedIn) { %>
+  <%- include('user-info') -%>
+
+<% }
+else { %>
+  <p>Innskráð/ur sem <%= username %>
+  <br><a class="link__link" href="/logout">Útskráning</a>
+  <% if (admin) { %>
+    <a class="link__link" href="/admin">Stjórnborð stjórnanda</a>
+  <% } %>
+<% } %>
 
 <%- include('footer') -%>

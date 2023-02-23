@@ -6,19 +6,23 @@ import {
   listEvent,
   listEventByName,
   listEvents,
-  updateEvent,
+  updateEvent
 } from '../lib/db.js';
-import passport, { ensureLoggedIn } from '../lib/login.js';
+import { ensureLoggedIn } from '../lib/login.js';
 import { slugify } from '../lib/slugify.js';
 import {
   registrationValidationMiddleware,
   sanitizationMiddleware,
-  xssSanitizationMiddleware,
+  xssSanitizationMiddleware
 } from '../lib/validation.js';
 
 export const adminRouter = express.Router();
 
 async function index(req, res) {
+  console.log(req.isAuthenticated());
+  if (!req.isAuthenticated()) {
+    return res.redirect('/');
+  }
   const events = await listEvents();
   const { user: { username } = {} } = req || {};
 
@@ -30,23 +34,6 @@ async function index(req, res) {
     title: 'Viðburðir — umsjón',
     admin: true,
   });
-}
-
-function login(req, res) {
-  if (req.isAuthenticated()) {
-    return res.redirect('/admin');
-  }
-
-  let message = '';
-
-  // Athugum hvort einhver skilaboð séu til í session, ef svo er birtum þau
-  // og hreinsum skilaboð
-  if (req.session.messages && req.session.messages.length > 0) {
-    message = req.session.messages.join(', ');
-    req.session.messages = [];
-  }
-
-  return res.render('login', { message, title: 'Innskráning' });
 }
 
 async function validationCheck(req, res, next) {
@@ -189,28 +176,6 @@ adminRouter.post(
   sanitizationMiddleware('description'),
   catchErrors(registerRoute)
 );
-
-adminRouter.get('/login', login);
-adminRouter.post(
-  '/login',
-
-  // Þetta notar strat að ofan til að skrá notanda inn
-  passport.authenticate('local', {
-    failureMessage: 'Notandanafn eða lykilorð vitlaust.',
-    failureRedirect: '/admin/login',
-  }),
-
-  // Ef við komumst hingað var notandi skráður inn, senda á /admin
-  (req, res) => {
-    res.redirect('/admin');
-  }
-);
-
-adminRouter.get('/logout', (req, res) => {
-  // logout hendir session cookie og session
-  req.logout();
-  res.redirect('/');
-});
 
 // Verður að vera seinast svo það taki ekki yfir önnur route
 adminRouter.get('/:slug', ensureLoggedIn, catchErrors(eventRoute));

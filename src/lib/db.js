@@ -98,6 +98,28 @@ export async function updateEvent(id, { name, slug, description } = {}) {
   return null;
 }
 
+export async function registerUser(name, username, password) {
+  console.log(name);
+  console.log(username);
+  console.log(password);
+  const q = `
+    INSERT INTO users
+      (name, username, password)
+    VALUES
+      ($1, $2, $3)
+    RETURNING
+      id, name, username, password;
+  `;
+  const values = [name, username, password];
+  const result = await query(q, values);
+
+  if (result && result.rowCount === 1) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
 export async function register({ name, comment, event } = {}) {
   const q = `
     INSERT INTO registrations

@@ -17,19 +17,24 @@
             <span class="event__registeredName"><%= entry.name %></span>
             <% if (entry.comment) { %>
               <span class="event__registeredComment"><%= entry.comment %></span>
+              <!--TODO Bæta við að eyða sjálfum sér af listanum -->
             <% } %>
           </li>
         <% }); %>
       </ul>
     <% } %>
   </div>
+
+  <% if (loggedIn) { %>
   <div class="event__registration">
     <h2 class="event__subtitle">Skráðu þig</h2>
     <form method="post" action="/<%= event.slug %>" enctype="application/x-www-form-urlencoded" class="">
+
+    <!--
       <div class="field field--input<%= locals.isInvalid('name', errors) ?  ' field--invalid' : '' %>">
         <label for="name">Nafn*:</label>
         <input type="text" name="name" id="name">
-      </div>
+      </div> -->
 
       <div class="field field--textarea<%= locals.isInvalid('comment', errors) ?  ' field--invalid' : '' %>">
         <label for="comment">Athugasemd:</label>
@@ -48,6 +53,16 @@
       <button class="button">Skrá mig</button>
     </form>
   </div>
+  <% }
+  else { %>
+    <div class="link">
+      <p style="margin-bottom: 5px;">Þú þarft að vera innskráður notandi til að geta skráð þig á viðburð</p>
+      <a class="link__link" href="/login">Innskráning</a>
+      <a class="link__link" href="/register">Stofna notanda</a>
+    </div>
+  <% } %>
+
+
   <div class="link">
     <a class="link__link" href="/">Til baka</a>
   </div>

@@ -3,26 +3,37 @@ import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import { listEvent, listEvents, listRegistered, register } from '../lib/db.js';
 import {
-  registrationValidationMiddleware,
   sanitizationMiddleware,
-  xssSanitizationMiddleware,
+  xssSanitizationMiddleware
 } from '../lib/validation.js';
 
 export const indexRouter = express.Router();
 
 async function indexRoute(req, res) {
   const events = await listEvents();
+  const loggedIn = req.isAuthenticated();
+  let username;
+  let admin;
+
+  if (loggedIn) {
+    username = req.user.username;
+    admin = req.user.admin;
+  }
+
 
   res.render('index', {
     title: 'Viðburðasíðan',
-    admin: false,
+    admin,
     events,
+    loggedIn,
+    username
   });
 }
 
 async function eventRoute(req, res, next) {
   const { slug } = req.params;
   const event = await listEvent(slug);
+  const loggedIn = req.isAuthenticated();
 
   if (!event) {
     return next();
@@ -36,6 +47,7 @@ async function eventRoute(req, res, next) {
     registered,
     errors: [],
     data: {},
+    loggedIn
   });
 }
 
@@ -55,6 +67,7 @@ async function validationCheck(req, res, next) {
   const { slug } = req.params;
   const event = await listEvent(slug);
   const registered = await listRegistered(event.id);
+  const loggedIn = req.isAuthenticated();
 
   const data = {
     name,
@@ -70,6 +83,7 @@ async function validationCheck(req, res, next) {
       event,
       registered,
       errors: validation.errors,
+      loggedIn
     });
   }
 
@@ -77,14 +91,17 @@ async function validationCheck(req, res, next) {
 }
 
 async function registerRoute(req, res) {
-  const { name, comment } = req.body;
+  const { name } = req.user;
+  const { comment } = req.body;
   const { slug } = req.params;
   const event = await listEvent(slug);
+  const loggedIn = req.isAuthenticated();
 
   const registered = await register({
     name,
     comment,
     event: event.id,
+    loggedIn
   });
 
   if (registered) {
@@ -98,7 +115,7 @@ indexRouter.get('/', catchErrors(indexRoute));
 indexRouter.get('/:slug', catchErrors(eventRoute));
 indexRouter.post(
   '/:slug',
-  registrationValidationMiddleware('comment'),
+  // registrationValidationMiddleware('comment'),
   xssSanitizationMiddleware('comment'),
   catchErrors(validationCheck),
   sanitizationMiddleware('comment'),
