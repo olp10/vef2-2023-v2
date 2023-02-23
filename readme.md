@@ -1,13 +1,17 @@
-# Vef2 2022, verkefni 2 sýnilausn
+# Vef2 2023, verkefni 2
 
-Sýnilausn á [verkefni 2](https://github.com/vefforritun/vef2-2022-v2).
+Lausn á verkefni 2
 
 ```bash
-createdb vef2-2022-v2
-createdb vef2-2022-v2-test
+createdb vef2-2023-v2
+createdb vef2-2023-v2-test
 # setja upp .env & .env.test með tengingu í gagnagrunna
 npm install
 npm run test
 npm run setup
-npm start # eða `npm run dev`
+npm run dev # eða `npm run dev`
 ```
+Admin notandi:
+
+user: Admin
+pass: 123

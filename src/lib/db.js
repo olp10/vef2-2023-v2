@@ -189,6 +189,23 @@ export async function listEvents(offset = 0, limit = 10) {
   return null;
 }
 
+export async function totalNumOfEvents() {
+  const q = `
+    SELECT
+      COUNT(*)
+    FROM
+      events
+  `;
+
+  const result = await query(q, []);
+
+  if (result) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
 export async function listEvent(slug) {
   const q = `
     SELECT

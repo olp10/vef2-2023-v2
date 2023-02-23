@@ -2,7 +2,7 @@
 import express from 'express';
 import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
-import { isAlreadyRegistered, listEvent, listEvents, listRegistered, register, unRegister } from '../lib/db.js';
+import { isAlreadyRegistered, listEvent, listEvents, listRegistered, register, totalNumOfEvents, unRegister } from '../lib/db.js';
 import {
   sanitizationMiddleware,
   xssSanitizationMiddleware
@@ -15,6 +15,7 @@ async function indexRoute(req, res) {
   offset = Number(offset);
   limit = Number(limit);
   const events = await listEvents(offset, limit);
+  const numOfEvents = await totalNumOfEvents();
 
   const result = {
     _links: {
@@ -31,7 +32,7 @@ async function indexRoute(req, res) {
     };
   }
 
-  if (events.length <= limit && offset < events.length) {
+  if (events.length <= limit && offset < events.length && numOfEvents.count > 10) {
     result._links.next = {
       href: `/?offset=${Number(offset) + limit}&limit=${limit}`,
     };
