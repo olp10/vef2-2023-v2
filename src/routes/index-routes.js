@@ -1,7 +1,7 @@
 import express from 'express';
 import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
-import { listEvent, listEvents, listRegistered, register } from '../lib/db.js';
+import { isAlreadyRegistered, listEvent, listEvents, listRegistered, register, unRegister } from '../lib/db.js';
 import {
   sanitizationMiddleware,
   xssSanitizationMiddleware
@@ -35,6 +35,11 @@ async function eventRoute(req, res, next) {
   const event = await listEvent(slug);
   const loggedIn = req.isAuthenticated();
 
+  let alreadyRegistered = false;
+  if (loggedIn) {
+    alreadyRegistered = await isAlreadyRegistered(req.user.name, event.id);
+  }
+
   if (!event) {
     return next();
   }
@@ -47,7 +52,8 @@ async function eventRoute(req, res, next) {
     registered,
     errors: [],
     data: {},
-    loggedIn
+    loggedIn,
+    alreadyRegistered
   });
 }
 
@@ -111,7 +117,24 @@ async function registerRoute(req, res) {
   return res.render('error');
 }
 
+async function unregisterRoute(req, res) {
+
+  const { slug } = req.params;
+  const event = await listEvent(slug);
+  const { id } = event;
+  const loggedIn = req.isAuthenticated();
+
+  if (loggedIn) {
+    await unRegister(req.user.name, id);
+  }
+
+  return res.redirect(`/${event.slug}`);
+}
+
 indexRouter.get('/', catchErrors(indexRoute));
+indexRouter.get('/:slug/delete',
+  catchErrors(unregisterRoute),
+  );
 indexRouter.get('/:slug', catchErrors(eventRoute));
 indexRouter.post(
   '/:slug',

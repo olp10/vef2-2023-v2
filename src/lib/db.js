@@ -76,19 +76,21 @@ export async function createEvent({ name, slug, description } = {}) {
 }
 
 // Updatear ekki description, erum ekki að útfæra partial update
-export async function updateEvent(id, { name, slug, description } = {}) {
+export async function updateEvent(id, { name, slug, description, location, url } = {}) {
   const q = `
     UPDATE events
       SET
         name = $1,
         slug = $2,
         description = $3,
+        location = $4,
+        url = $5,
         updated = CURRENT_TIMESTAMP
     WHERE
-      id = $4
-    RETURNING id, name, slug, description;
+      id = $6
+    RETURNING id, name, slug, description, location, url;
   `;
-  const values = [name, slug, description, id];
+  const values = [name, slug, description, location, url, id];
   const result = await query(q, values);
 
   if (result && result.rowCount === 1) {
@@ -99,9 +101,6 @@ export async function updateEvent(id, { name, slug, description } = {}) {
 }
 
 export async function registerUser(name, username, password) {
-  console.log(name);
-  console.log(username);
-  console.log(password);
   const q = `
     INSERT INTO users
       (name, username, password)
@@ -159,7 +158,7 @@ export async function listEvents() {
 export async function listEvent(slug) {
   const q = `
     SELECT
-      id, name, slug, description, created, updated
+      id, name, slug, description, created, updated, location, url
     FROM
       events
     WHERE slug = $1
@@ -191,6 +190,43 @@ export async function listEventByName(name) {
   }
 
   return null;
+}
+
+export async function unRegister(name, event) {
+  const q = `
+    DELETE
+    FROM
+      registrations
+    WHERE event = $1
+    AND name = $2
+  `;
+
+  const result = await query(q, [event, name]);
+
+  if (result) {
+    return result.rows;
+  }
+
+  return null;
+}
+
+export async function isAlreadyRegistered(name, event) {
+  const q = `
+    SELECT
+      name
+    FROM
+      registrations
+    WHERE event = $1
+    AND name = $2
+  `;
+
+  const result = await query(q, [event, name]);
+
+  if (result.rowCount > 0) {
+    return true;
+  }
+
+  return false;
 }
 
 export async function listRegistered(event) {

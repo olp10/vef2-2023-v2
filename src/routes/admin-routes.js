@@ -19,7 +19,6 @@ import {
 export const adminRouter = express.Router();
 
 async function index(req, res) {
-  console.log(req.isAuthenticated());
   if (!req.isAuthenticated()) {
     return res.redirect('/');
   }
@@ -75,7 +74,7 @@ async function validationCheck(req, res, next) {
 }
 
 async function validationCheckUpdate(req, res, next) {
-  const { name, description } = req.body;
+  const { name, description, location, url } = req.body;
   const { slug } = req.params;
   const { user: { username } = {} } = req;
 
@@ -84,6 +83,8 @@ async function validationCheckUpdate(req, res, next) {
   const data = {
     name,
     description,
+    location,
+    url,
   };
 
   const validation = validationResult(req);
@@ -127,7 +128,7 @@ async function registerRoute(req, res) {
 }
 
 async function updateRoute(req, res) {
-  const { name, description } = req.body;
+  const { name, description, location, url } = req.body;
   const { slug } = req.params;
 
   const event = await listEvent(slug);
@@ -138,6 +139,8 @@ async function updateRoute(req, res) {
     name,
     slug: newSlug,
     description,
+    location,
+    url
   });
 
   if (updated) {
@@ -152,17 +155,22 @@ async function eventRoute(req, res, next) {
   const { user: { username } = {} } = req;
 
   const event = await listEvent(slug);
+  console.info(event.location);
 
   if (!event) {
     return next();
   }
-
   return res.render('admin-event', {
     username,
     title: `${event.name} — Viðburðir — umsjón`,
     event,
     errors: [],
-    data: { name: event.name, description: event.description },
+    data: {
+      name: event.name,
+      description: event.description,
+      location: event.location,
+      url: event.url
+     },
   });
 }
 

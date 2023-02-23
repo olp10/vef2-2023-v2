@@ -3,7 +3,14 @@
 <section class="event">
   <div class="event__info">
     <h1 class="event__title"><%= event.name %></h1>
-    <p class="event__description"><%= event.description %></p>
+    <p class="event__description"><%= event.description %></p></br>
+
+    <% if (event.location !== null && event.location.length !== 0) { %>
+      <p class="event__description">Staðsetning: <%= event.location %></p>
+    <% } %>
+    <% if (event.url !== null && event.url.length !== 0) { %>
+      <p class="event__description">Slóð: <%= event.url %></p>
+    <% } %>
   </div>
 
   <div class="event__registered">
@@ -17,7 +24,6 @@
             <span class="event__registeredName"><%= entry.name %></span>
             <% if (entry.comment) { %>
               <span class="event__registeredComment"><%= entry.comment %></span>
-              <!--TODO Bæta við að eyða sjálfum sér af listanum -->
             <% } %>
           </li>
         <% }); %>
@@ -26,33 +32,37 @@
   </div>
 
   <% if (loggedIn) { %>
-  <div class="event__registration">
-    <h2 class="event__subtitle">Skráðu þig</h2>
-    <form method="post" action="/<%= event.slug %>" enctype="application/x-www-form-urlencoded" class="">
+    <% if (!alreadyRegistered) {%>
+      <div class="event__registration">
+        <h2 class="event__subtitle">Skráðu þig</h2>
+        <form method="post" action="/<%= event.slug %>" enctype="application/x-www-form-urlencoded" class="">
 
-    <!--
-      <div class="field field--input<%= locals.isInvalid('name', errors) ?  ' field--invalid' : '' %>">
-        <label for="name">Nafn*:</label>
-        <input type="text" name="name" id="name">
-      </div> -->
+        <!--
+          <div class="field field--input<%= locals.isInvalid('name', errors) ?  ' field--invalid' : '' %>">
+            <label for="name">Nafn*:</label>
+            <input type="text" name="name" id="name">
+          </div> -->
 
-      <div class="field field--textarea<%= locals.isInvalid('comment', errors) ?  ' field--invalid' : '' %>">
-        <label for="comment">Athugasemd:</label>
-        <textarea name="comment" id="comment"><%= data.comment %></textarea>
+          <div class="field field--textarea<%= locals.isInvalid('comment', errors) ?  ' field--invalid' : '' %>">
+            <label for="comment">Athugasemd:</label>
+            <textarea name="comment" id="comment"><%= data.comment %></textarea>
+          </div>
+
+          <% if (errors.length > 0) { %>
+            <h3 class="errors__title">Villur við skráningu:</h3>
+            <ul class="errors">
+              <% errors.forEach((error) => { %>
+                <li class="error"><label for="<%= error.param %>"><%= error.msg %></label></li>
+              <% }); %>
+            </ul>
+          <% } %>
+
+          <button class="button">Skrá mig</button>
+        </form>
       </div>
-
-      <% if (errors.length > 0) { %>
-        <h3 class="errors__title">Villur við skráningu:</h3>
-        <ul class="errors">
-          <% errors.forEach((error) => { %>
-            <li class="error"><label for="<%= error.param %>"><%= error.msg %></label></li>
-          <% }); %>
-        </ul>
-      <% } %>
-
-      <button class="button">Skrá mig</button>
-    </form>
-  </div>
+    <%  } else { %>
+      <a class="link__link" href="/<%= event.slug %>/delete">Afskrá mig</a>
+    <% } %>
   <% }
   else { %>
     <div class="link">
