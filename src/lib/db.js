@@ -100,6 +100,38 @@ export async function updateEvent(id, { name, slug, description, location, url }
   return null;
 }
 
+
+export async function removeRegistrationsFromEvent(id) {
+  const q = `
+    DELETE FROM registrations
+    WHERE event=$1;
+  `;
+  const values = [id];
+  const result = await query(q, values);
+
+  if (result && result.rowCount === 1) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
+export async function removeEvent(id) {
+  removeRegistrationsFromEvent(id);
+  const q = `
+    DELETE FROM events
+    WHERE id=$1;
+  `;
+  const values = [id];
+  const result = await query(q, values);
+
+  if (result && result.rowCount === 1) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
 export async function registerUser(name, username, password) {
   const q = `
     INSERT INTO users
@@ -194,6 +226,7 @@ export async function listEventByName(name) {
   return null;
 }
 
+
 export async function unRegister(name, event) {
   const q = `
     DELETE
@@ -224,7 +257,7 @@ export async function isAlreadyRegistered(name, event) {
 
   const result = await query(q, [event, name]);
 
-  if (result.rowCount > 0) {
+  if (result && result.rowCount > 0) {
     return true;
   }
 

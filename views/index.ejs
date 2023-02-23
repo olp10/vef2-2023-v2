@@ -3,19 +3,21 @@
 <h1><%= title %></h1>
 
 <%- include('events') -%>
-
 <%- include('paging') -%>
 
-<% if (!loggedIn) { %>
-  <%- include('user-info') -%>
+<div style="margin-top: 2rem; display: flex; flex-direction: column;">
 
-<% }
-else { %>
-  <p>Innskráð/ur sem <%= username %>
-  <br><a class="link__link" href="/logout">Útskráning</a>
-  <% if (admin) { %>
-    <a class="link__link" href="/admin">Stjórnborð stjórnanda</a>
+  <% if (!loggedIn) { %>
+    <%- include('user-info') -%>
+
+  <% }
+  else { %>
+    <p>Innskráð/ur sem <strong><u><%= username %></u></strong>
+    <br><a class="link__link" href="/logout">Útskráning</a>
+    <% if (admin) { %>
+      <a class="link__link" href="/admin">Stjórnborð stjórnanda</a>
+    <% } %>
   <% } %>
-<% } %>
+</div>
 
 <%- include('footer') -%>

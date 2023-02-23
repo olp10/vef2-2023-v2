@@ -6,6 +6,7 @@ import {
   listEvent,
   listEventByName,
   listEvents,
+  removeEvent,
   updateEvent
 } from '../lib/db.js';
 import { ensureLoggedIn } from '../lib/login.js';
@@ -173,6 +174,20 @@ async function eventRoute(req, res, next) {
   });
 }
 
+async function deleteEvent(req, res) {
+  const { slug } = req.params;
+  const event = await listEvent(slug);
+  const { id } = event;
+
+  const loggedIn = req.isAuthenticated();
+
+  if (loggedIn && req.user.admin) {
+    await removeEvent(id);
+  }
+  return res.redirect('/');
+
+}
+
 adminRouter.get('/', ensureLoggedIn, catchErrors(index));
 adminRouter.post(
   '/',
@@ -186,6 +201,7 @@ adminRouter.post(
 
 // Verður að vera seinast svo það taki ekki yfir önnur route
 adminRouter.get('/:slug', ensureLoggedIn, catchErrors(eventRoute));
+adminRouter.get('/:slug/delete', catchErrors(deleteEvent))
 adminRouter.post(
   '/:slug',
   ensureLoggedIn,

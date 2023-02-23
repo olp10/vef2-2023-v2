@@ -5,8 +5,11 @@ import {
   createSchema,
   dropSchema,
   end,
+  isAlreadyRegistered,
+  query,
   register,
-  updateEvent,
+  unRegister,
+  updateEvent
 } from '../lib/db';
 
 dotenv.config({ path: './.env.test' });
@@ -85,5 +88,18 @@ describe('db', () => {
     const registration = await register({ event: 0 });
 
     expect(registration).toBeNull();
+  });
+
+  it('checks if a user is already registered', async () => {
+    const isRegistered = await isAlreadyRegistered('Óli', 'Strengur');
+
+    expect(isRegistered).toBeFalsy();
+  });
+
+  it('unregisters a user and removes them from the database', async () => {
+    register('Name', 'Comment', 1);
+    unRegister('Name', 1);
+
+    expect(await query('SELECT * FROM registrations WHERE name=$1', ['Name']).rows).toEqual(undefined);
   });
 });

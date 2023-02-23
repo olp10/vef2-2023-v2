@@ -10,6 +10,7 @@ module.exports = {
   },
   rules: {
     'no-restricted-syntax': 0,
+    'no-underscore-dangle': 0,
     'import/prefer-default-export': 0,
     'import/no-extraneous-dependencies': 0,
     quotes: ['error', 'single'],
@@ -23,7 +24,7 @@ module.exports = {
     'max-len': [
       'warn',
       {
-        code: 100,
+        code: 115,
         ignoreUrls: true,
         ignoreComments: true,
         ignoreTemplateLiterals: true,
