@@ -42,8 +42,6 @@
     "jest": "^29.4.3",
     "nodemon": "^2.0.20",
     "prettier": "^2.8.4",
-    "stylelint": "^15.2.0",
-    "stylelint-config-sass-guidelines": "^9.0.1",
-    "stylelint-config-standard": "^30.0.1"
+    "stylelint": "^15.2.0"
   }
 }
