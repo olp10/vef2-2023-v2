@@ -9,7 +9,7 @@
       <p class="event__description">Staðsetning: <%= event.location %></p>
     <% } %>
     <% if (event.url !== null && event.url.length !== 0) { %>
-      <p class="event__description">Slóð: </p><a href="<%= event.url %>"><%= event.url %></a>
+      <p class="event__description">Slóð: <a href="<%= event.url %>"><%= event.url %></a></p>
     <% } %>
   </div>
 
