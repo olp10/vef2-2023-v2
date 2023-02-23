@@ -1,7 +1,5 @@
 # Vef2 2023, verkefni 2
 
-Lausn á verkefni 2
-
 ```bash
 createdb vef2-2023-v2
 createdb vef2-2023-v2-test
@@ -9,9 +7,11 @@ createdb vef2-2023-v2-test
 npm install
 npm run test
 npm run setup
-npm run dev # eða `npm run dev`
+npm run dev
 ```
+
 Admin notandi:
 
 user: Admin
+
 pass: 123
